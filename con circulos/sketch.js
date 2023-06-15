@@ -1,6 +1,11 @@
 let canvasWidth = 800;
 let canvasHeight = 800;
 
+//rojoNgero
+let rojoNgero;
+let rojoNegroPhaseTime = 4000; // Tiempo en milisegundos para la fase rojoNegro
+let rojoNegroPhaseActive = false;
+
 //amarillas
 let customImage, customImage2;
 let minDistance = 650;
@@ -24,6 +29,9 @@ let currentTime = 0;
 
 function setup() {
   createCanvas(canvasWidth, canvasHeight);
+
+  //negroRojo
+  negroRojo = new NegrosRojos();
 
   //amarillas
   customImage = new CustomImage(random(width), random(0, 400));
@@ -54,8 +62,22 @@ function draw() {
   // Actualizar el tiempo actual
   currentTime += deltaTime;
 
+  // Fase rojoNgero
+    if (rojoNegroPhaseActive) {
+    rojoNegroPhaseActive.moving = true; // Establecer la variable "moving" en true durante el turno de "rojoNegro"
+    rojoNegro.dibujar();
+    rojoNegro.updatePosition();
+
+    // Verificar si ha pasado el tiempo de la fase rojoNegro
+    if (currentTime >= rojoNegroPhaseTime) {
+      rojoNegroPhaseActive = false;
+      rojoNegro.moving = false; // Establecer la variable "moving" en false después del turno de "rojoNegro"
+      currentTime = 0; // Reiniciar el tiempo actual
+    }
+  }
+
   // Fase amarilla
-  if (yellowPhaseActive) {
+  else if (yellowPhaseActive) {
     customImage.showImage();
     customImage.updatePosition();
     customImage2.showImage();
@@ -63,7 +85,7 @@ function draw() {
     customImage.checkDistance(customImage2);
 
     // Verificar si ha pasado el tiempo de la fase amarilla
-    if (currentTime >= yellowPhaseTime) {
+   if (currentTime >= yellowPhaseTime) {
       yellowPhaseActive = false;
       lilacPhaseActive = true;
       currentTime = 0; // Reiniciar el tiempo actual
@@ -104,6 +126,7 @@ function draw() {
       l.draw();
     }
     celestes.dibujar();
+    rojoNegro.dibujar();
   }
 }
 
@@ -111,5 +134,10 @@ function mouseMoved() {
   if (celestePhaseActive && celestes.moving) {
     celestes.updatePosition();
     celestes.checkDistances();
+  }
+
+  else if (rojoNegroPhaseActive && rojoNegro.moving) {
+    rojoNegro.updatePosition();
+    rojoNegro.checkDistances();
   }
 }
